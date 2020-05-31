@@ -2,3 +2,5 @@ data/*
 thirdparty/*
 material/*
 !.keep
+
+try.py
