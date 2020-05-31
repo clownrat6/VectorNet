@@ -1,0 +1,4 @@
+data/*
+thirdparty/*
+material/*
+!.keep
