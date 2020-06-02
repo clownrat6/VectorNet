@@ -2,5 +2,6 @@ data/*
 thirdparty/*
 material/*
 !.keep
+!material/readme_pic
 
 try.py
