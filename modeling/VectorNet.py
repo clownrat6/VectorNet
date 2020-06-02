@@ -71,16 +71,47 @@ class polyline_subgraph(nn.Module):
 
 
 class global_graph(nn.Module):
-    def __init__(self):
-        pass
+    def __init__(self, depth, width, width_sub):
+        super(global_graph, self).__init__()
+        self.depth = depth
+        self.width = width
+        self.width = width_sub
+        self.linear_Q = []
+        self.linear_K = []
+        self.linear_V = []
 
+        for i in range(depth):
+            if(i == 0):
+                self.linear_Q.append(NCL_linear(width_sub, width))
+                self.linear_K.append(NCL_linear(width_sub, width))
+                self.linear_V.append(NCL_linear(width_sub, width))
+            else:
+                self.linear_Q.append(NCL_linear(width, width))
+                self.linear_K.append(NCL_linear(width, width))
+                self.linear_V.append(NCL_linear(width, width))
+
+        self.softmax = nn.Softmax()
+
+    def forward(self, P_matrix):
+        # NCL format
+        # The trajectory polyline node feature is one row of the P_matrix.
+        for i in range(self.depth):
+            PQ = P_matrix; PK = P_matrix; PV = P_matrix
+            PQ = self.linear_Q[i](PQ)
+            PK = self.linear_K[i](PK)
+            PV = self.linear_V[i](PV)
+        
+            weight = torch.bmm(PQ, torch.transpose(PK, -2, -1))
+            out = torch.bmm(self.softmax(weight), PV)
+            P_matrix = out
+
+        return P_matrix
+        
 
 if __name__ == "__main__":
-    model = polyline_subgraph(2, 128)
+    model = global_graph(1, 64, 128)
 
-    a = torch.randn([1, 4])
-    a = torch.unsqueeze(a, -1)
-    a = a.repeat(1, 1, 20)
+    a = torch.randn(2, 128, 99)
 
     out = model(a)
     print(torch.sum(out))
