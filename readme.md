@@ -14,13 +14,18 @@
   
 ![](material/readme_pic/polyline_subgraph.png)  
   
-而我们将这些流程具体化之后则变为:  
+而我们将这些流程具体化之后则变为 (我们将 width 设为 128, depth 待定):  
   
-![](material/readme_pic/Detailed_polyline_subgraph.png)  
+![](material/readme_pic/Detailed_polyline_subgraph.png)![](material/readme_pic/polyline_node_feature.png)  
   
-每一个 polyline 的每一个 vector 会被 embedding 层转化为特征向量, 而后在经过 aggregate 聚合成单个特征向量, 这个特征向量就是 polyline 的特征表征.  
+每一个 polyline 的每一个 vector 会被 embedding 层转化为特征向量, 而后在经过 aggregate 聚合成单个特征向量, 这个特征向量就是 polyline 的特征表征. 我们注意一点细节, 当原始的 lane, trajectory 所在的 polyline 被编码时, 这里的 MLP 也就是 Node Encoder 具体的计算操作也许是这样:   
+  
+![](material/readme_pic/MLP_first_layer.png)
 
+## Global graph
 
+  
+  
 
 ## Argoverse dataset
 
@@ -46,3 +51,5 @@ V, k, Q 三个 embedding 特征向量经过线性层，即全连接层编码之�
 <span id = "ref1">[1] Gao J, Sun C, Zhao H, et al. VectorNet: Encoding HD Maps and Agent Dynamics from Vectorized Representation[J]. arXiv preprint arXiv:2005.04259, 2020.</span>  
 <span id = "ref2">[2] Chang M F, Lambert J, Sangkloy P, et al. Argoverse: 3d tracking and forecasting with rich maps[C]//Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition. 2019: 8748-8757.</span>  
 <span id = "ref3">[3] Vaswani A, Shazeer N, Parmar N, et al. Attention is all you need[C]//Advances in neural information processing systems. 2017: 5998-6008.</span>  
+[[4] NLP中的 Attention 机制](https://zhuanlan.zhihu.com/p/59698165)  
+[[5] 自然语言处理中的自注意力机制（Self-attention Mechanism）](https://www.cnblogs.com/robert-dlut/p/8638283.html)
