@@ -17,11 +17,13 @@ class loss_collection(object):
         batch_size, coord_num, vector_num = logit.size()
         var = torch.var(logit)
 
+        Sigma = torch.sqrt(var)
+
         m = coord_num*vector_num
 
-        criterion = *torch.log(2*3.14)/2 + 
+        loss = m*torch.log(2*3.14)/2 + m*log(Sigma) + 1/(2*var)*torch.sum(logit-target) 
 
-        return 
+        return loss
 
     def MSE_loss(self, logit, target):
         criterion = nn.MSELoss(reduction='mean')
