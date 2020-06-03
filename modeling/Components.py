@@ -41,6 +41,9 @@ class encode(nn.Module):
 
 
 class polyline_encoder(nn.Module):
+    """
+    The encoder which can convert polyline to graph node feature.
+    """
     def __init__(self, depth, width):
         super(polyline_encoder, self).__init__()
         self.depth = depth
@@ -77,6 +80,9 @@ class polyline_encoder(nn.Module):
 
 
 class global_graph(nn.Module):
+    """
+    The global interaction graph which is implemented by self-attention mechanism.
+    """
     def __init__(self, depth, width, width_sub):
         super(global_graph, self).__init__()
         self.depth = depth

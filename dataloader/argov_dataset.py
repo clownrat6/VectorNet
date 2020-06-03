@@ -7,6 +7,15 @@ import random
 from utils.process import *
 
 def map_representation_padding(map_pres, map_polyline_num, polyline_vector_num):
+    """
+    padding the map presentation of scenario.
+    input:
+        map_pres: the vector sets of lane.
+        map_polyline_num: the number of polyline contained in one scenario after padding.
+        polyline_vector_num: the number of vector contained in one polyline after padding.
+    return:
+        map_pres: the vector sets of lane after padding.
+    """
     for polyline in map_pres: 
         if len(polyline) >= polyline_vector_num:
             polyline = polyline[:polyline_vector_num]
@@ -24,6 +33,17 @@ def map_representation_padding(map_pres, map_polyline_num, polyline_vector_num):
 
 
 def form_padding_batch(scenario_list, map_polyline_num, polyline_vector_num):
+    """
+    To form a padding batch.
+    input:
+        scenario_list: the customed scenario object list
+        map_polyline_num: the number of polyline contained in one scenario after padding.
+        polyline_vector_num: the number of vector contained in one polyline after padding.
+    ret:
+        map_vectors_batch: map presentation batch after padding.
+        train_trajectory_batch: train trajetory batch after padding.
+        test_trajectory_batch: test trajectory batch after padding.
+    """
     train_trajectory_batch = []
     test_trajectory_batch = []
     map_vectors_batch = []
@@ -41,6 +61,15 @@ def form_padding_batch(scenario_list, map_polyline_num, polyline_vector_num):
     return map_vectors_batch, train_trajectory_batch, test_trajectory_batch
 
 def form_batch(scenario_list):
+    """
+    To form a plain batch. Different scenario has different count of polylines.
+    input:
+        scenario_list: the customed scenario object list
+    ret:
+        map_vectors_batch: map presentation batch no padding.
+        train_trajectory_batch: train trajetory batch no padding.
+        test_trajectory_batch: test trajectory batch no padding.
+    """
     train_trajectory_batch = []
     test_trajectory_batch = []
     map_vectors_batch = []
@@ -57,6 +86,9 @@ def form_batch(scenario_list):
 
 
 class dataloader(object):
+    """
+    Construct a data generator or padding data generator
+    """
     def __init__(self, batch_size, data_path=None):
         if data_path == None:
             self.ap = argoverse_processor()

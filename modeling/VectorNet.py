@@ -4,6 +4,10 @@ import torch.nn as nn
 from .Components import *
 
 class VectorNet(nn.Module):
+    """
+    This is one type implementation of VectorNet.
+    This implementation is suitable to unpadding lane polyline.
+    """
     def __init__(self, depth_sub, width_sub, depth_global, width_global):
         super(VectorNet, self).__init__()
         self.depth_sub = depth_sub
@@ -15,6 +19,12 @@ class VectorNet(nn.Module):
         self.traj_decode = nn.Linear(width_global, 4)
 
     def map_encode(self, lane_polylines_batches):
+        """
+        Map representation like lane two-side line is fixed. So we use a object attribute to keep it.
+        input:
+            lane_polylines_batches: [lane_polylines]*batch_size. the number of polylines are different between items in batch.
+                p.s. lane_polylines = [lane_polyline]*polyline_num, lane_polyline.shape = [4(coordinates, lane_polyline_vector_num)]  
+        """
         # map polyline node feature is fixed.
         # shape: [[[4(coordinates), lane_polyline_vector_num], ...], ...]
         self.map_pres_batch = []

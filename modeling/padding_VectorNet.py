@@ -4,6 +4,9 @@ import torch.nn as nn
 from .padding_Components import *
 
 class padding_VectorNet(nn.Module):
+    """
+    A padding implementation of VectorNet which is suitable to process scenario thai has same count of polyline.
+    """
     def __init__(self, depth_sub, width_sub, depth_global, width_global):
         super(padding_VectorNet, self).__init__()
         self.depth_sub = depth_sub
