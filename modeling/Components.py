@@ -125,13 +125,27 @@ class global_graph(nn.Module):
         
 
 if __name__ == "__main__":
-    model = global_graph(3, 64, 128)
+    
+    model_first = polyline_encoder(3, 128)
 
-    torch.save(model.state_dict(), '1.pth')
+    scenario_1 = [torch.randn(1, 4, 9), torch.randn(1, 4, 12)]
 
-    exit()
-    a = torch.randn(2, 128, 99)
+    scenario_2 = [torch.randn(1, 4, 7), torch.randn(1, 4, 13), torch.randn(1, 4, 27)]
 
-    out = model(a)
-    print(torch.sum(out))
-    print(out.shape)
+    one_batch = [scenario_1, scenario_2]
+
+    polyline_node_features_batch = []
+    for scenario in one_batch:
+        polyline_node_features = []
+        for polyline in scenario:
+            polyline_node_features.append(model_first(polyline))
+        polyline_node_features_batch.append(polyline_node_features)
+
+    model_second = global_graph(1, 128, 128)
+    processed_graph_batch = []
+    for polyline_node_features in polyline_node_features_batch:
+        polyline_node_features = torch.stack(polyline_node_features, -1)
+        processed_graph = model_second(polyline_node_features)
+        processed_graph_batch.append(processed_graph)
+    
+    [print(x.shape) for x in processed_graph_batch]

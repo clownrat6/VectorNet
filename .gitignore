@@ -1,7 +1,22 @@
+# global
+
+# file
+try.py
+*.pth
+*.pkl
+
+# folder
+.vscode/
+__pycache__/
+
+# local
+
+
+
+# special
 data/*
 thirdparty/*
 material/*
 !.keep
 !material/readme_pic
 
-try.py

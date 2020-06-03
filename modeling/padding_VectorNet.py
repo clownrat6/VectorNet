@@ -1,11 +1,11 @@
 import torch
 import torch.nn as nn
 
-from padding_Components import *
+from .padding_Components import *
 
-class VectorNet(nn.Module):
+class padding_VectorNet(nn.Module):
     def __init__(self, depth_sub, width_sub, depth_global, width_global):
-        super(VectorNet, self).__init__()
+        super(padding_VectorNet, self).__init__()
         self.depth_sub = depth_sub
         self.width_sub = width_sub
         self.depth_global = depth_global
@@ -21,7 +21,7 @@ class VectorNet(nn.Module):
         return self.map_pres
 
     def forward(self, traj_batches):
-        traj_batches = self.polyline_embedding(traj_batches)
+        traj_batches = self.polyline_embedding(torch.unsqueeze(traj_batches, -1))
         temp = torch.cat([self.map_pres, traj_batches], axis=-1)
         temp = self.global_interaction(temp)
         temp = temp[:, :, -1]
@@ -33,12 +33,13 @@ class VectorNet(nn.Module):
 if __name__ == '__main__':
     model = VectorNet(3, 64, 1, 128)
 
-    import random
+    map_vectors = torch.randn(2, 4, 9, 160)
 
-    a = torch.randn(2, 4, 37, 49)
+    model.map_encode(a)
 
-    print(model.map_encode(a).shape)
-    b = torch.randn(2, 4, 31, 1)
-    print(model(b).shape)
-    exit()
-    torch.save(model.state_dict(), '1.pth')
+    trajectory = torch.randn(2, 4, 19, 1)
+    
+    out = model(trajectory)
+    
+    print(out.shape)
+    torch.save(model.state_dict(), 'test.pth')

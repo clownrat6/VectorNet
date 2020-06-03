@@ -132,49 +132,47 @@ def scenario_vectorization(one_scenario):
     last_observed_coordinate = agent_traj[19]
     lc = last_observed_coordinate
 
-    vector_sets = {}
+    vector_sets = []
 
-    j = 0
     # Firstly, we use lane edge to vectorize the lane rather than use lane center line.
     for lane_edge in lane_edges:
         # single lane
-        j += 1
         one_polyline = []
         # left-hand side lane edge line vectorization
         for i in range(len(lane_edge)-1):
             start = (lane_edge[i][0][0] - lc[0], lane_edge[i][0][1] - lc[1])
             end = (lane_edge[i+1][0][0] - lc[0], lane_edge[i+1][0][1] - lc[1])
-            vector = [start, end]
+            vector = np.array([*start, *end])
             one_polyline.append(vector)
-        vector_sets[j] = one_polyline
+        vector_sets.append(one_polyline)
         # right-hand side lane edge line vectorization
-        j += 1
+        
         one_polyline = []
         for i in range(len(lane_edge)-1):
             start = (lane_edge[i][1][0] - lc[0], lane_edge[i][1][1] - lc[1])
             end = (lane_edge[i+1][1][0] - lc[0], lane_edge[i+1][1][1] - lc[1])
-            vector = [start, end]
+            vector = np.array([*start, *end])
             one_polyline.append(vector)
-        vector_sets[j] = one_polyline
+        vector_sets.append(one_polyline)
         
 
     # Then, we vectorize the agent trajectory.
     # (0, 2] used as observation and (2, 5] used as trajectory prediction
-    train_jectory = []
+    train_trajectory = []
     for i in range(19):
         start = (agent_traj[i][0] - lc[0], agent_traj[i][1] - lc[1])
         end = (agent_traj[i+1][0] - lc[0], agent_traj[i+1][1] - lc[1])
-        vector = [start, end]
-        train_jectory.append(vector)
+        vector = np.array([*start, *end])
+        train_trajectory.append(vector)
 
     test_trajectory = []
     for i in range(20, 49):
         start = (agent_traj[i][0] - lc[0], agent_traj[i][1] - lc[1])
         end = (agent_traj[i+1][0] - lc[0], agent_traj[i+1][1] - lc[1])
-        vector = [start, end]
+        vector = np.array([*start, *end])
         test_trajectory.append(vector)
     
-    return vector_sets, train_jectory, test_trajectory
+    return vector_sets, train_trajectory, test_trajectory
 
 
 if __name__ == "__main__":
@@ -184,10 +182,8 @@ if __name__ == "__main__":
 
     map_pres, train_trajectory, test_trajectory = scenario_vectorization(scenario)
 
-    keys = list(map_pres.keys())
-
-    print(map_pres[keys[-1]], train_trajectory, test_trajectory)
-    print(len(train_trajectory), len(test_trajectory))
+    print('scenario lane polylines num: {}'.format(len(map_pres))) 
+    print('train trajectory vector num: {}\ntest trajectory vector num:{}'.format(len(train_trajectory), len(test_trajectory)))
 
     ap.visualization_lanes(ap.scenarios[0])
     ap.visualization_trajectory(ap.scenarios[0])

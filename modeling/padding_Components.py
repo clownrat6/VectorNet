@@ -154,11 +154,10 @@ class padding_global_graph(nn.Module):
         
 
 if __name__ == "__main__":
-    model = padding_polyline_encoder(3, 64)
-    model_ = padding_global_graph(1, 128, 64)
-    a = torch.randn(2, 4, 37, 49)
+    model = nn.Sequential(padding_polyline_encoder(3, 64), padding_global_graph(1, 128, 64))
+
+    a = torch.randn(2, 4, 9, 160)
 
     out = model(a)
-    out = model_(out)
-    print(torch.sum(out))
+
     print(out.shape)
