@@ -6,7 +6,7 @@
   
 ![](material/readme_pic/some_lanes_of_Miami.png)  
   
-根据 [[1]] 中的 Figure 2, 似乎是用 lane two-side edge line 来表征 lane, lane two-side edge line 也是通过坐标点来表征的, 我梦恩据坐标点将其向量化, 这里 lane 被分为了很多小段而一小段 lane 就构成一个 polyline. 这里由于 [[1]](#ref1) 中提到了要将以最后一个推理部分的观测点作参考, 所以我们所有的坐标点都减去了当前 scenario 下最后一个观测点即 agent trajectory 在 2s 时的坐标.  
+根据 [[1]](#ref1) 中的 Figure 2, 似乎是用 lane two-side edge line 来表征 lane, lane two-side edge line 也是通过坐标点来表征的, 我梦恩据坐标点将其向量化, 这里 lane 被分为了很多小段而一小段 lane 就构成一个 polyline. 这里由于 [[1]](#ref1) 中提到了要将以最后一个推理部分的观测点作参考, 所以我们所有的坐标点都减去了当前 scenario 下最后一个观测点即 agent trajectory 在 2s 时的坐标.  
 
 ## Constructing the polyline subgraphs
 
