@@ -1,4 +1,4 @@
-# VectorNet implementation
+# xxxNet implementation
 
 ## Representing HD maps and trajectories
 
@@ -24,6 +24,9 @@
 
 ## Global graph
 
+全局网络通过 GNN 之后会将所有的节点都更新一遍, 而这些更新了的节点中的与 agent trajectory 有关的项就可以提取出来使用 decoder 来解码, 并预测下一时刻的向量, 而重要的是我们需要预测接下来的 [2s, 5s) 的所有 trajectory 向量, 所以需要通过输入已经预测出来的 trajectory 向量合并到 agent 的 polyline 重新计算与 agent trajectory 有关的节点, 来预测已经预测出来的时刻的下一时刻.  
+  
+![](material/readme_pic/global_graph.png)  
   
   
 

@@ -1,118 +1,63 @@
 import torch
 import torch.nn as nn
 
+from Components import *
 
-class NCL_linear(nn.Module):
-    # THe linear layer of pytorch can only process NWHC or NLC feature map.
-    def __init__(self, in_channel, out_channel):
-        super(NCL_linear, self).__init__()
-        self.mlp = nn.Linear(in_channel, out_channel)
-        self.norm = nn.BatchNorm1d(out_channel)
-        self.ReLU = nn.ReLU()
+class VectorNet(nn.Module):
+    def __init__(self, depth_sub, width_sub, depth_global, width_global):
+        super(VectorNet, self).__init__()
+        self.depth_sub = depth_sub
+        self.width_sub = width_sub
+        self.depth_global = depth_global
+        self.width_global = width_global
+        self.polyline_embedding = polyline_encoder(depth_sub, width_sub)
+        self.global_interaction = global_graph(depth_global, width_global, width_sub)
+        self.traj_decode = nn.Linear(width_global, 4)
 
-    def forward(self, x):
-        # NCL -> NLC
-        x = x.permute(0, 2, 1)
+    def map_encode(self, lane_polylines_batches):
+        # map polyline node feature is fixed.
+        # shape: [[[4(coordinates), lane_polyline_vector_num], ...], ...]
+        self.map_pres = []
+        for lane_polylines in lane_polylines_batches:
+            # different batch has different count of polylines
+            lane_polyline_node_features = []
+            for lane_polyline in lane_polylines:
+                # different polyline has different count of vectors
+                temp = self.polyline_embedding(lane_polyline)
+                lane_polyline_node_features.append(temp)
 
-        x = self.mlp(x)
+            self.map_pres.append(torch.stack(lane_polyline_node_features, -1))
 
-        # NLC -> NCL
-        x = x.permute(0, 2, 1)
-        x = self.norm(x)
-        x = self.ReLU(x)
-
-        return x
-
-
-class encode(nn.Module):
-    def __init__(self, in_channel, out_channel):
-        super(encode, self).__init__()
-        self.flatten = lambda x: torch.flatten(x, 1, -2)
-        self.mlp = NCL_linear(in_channel, out_channel)
-
-    def forward(self, vectors):
-        # vectors: [batch_size, vector_num, 4 or 128]
-        if(vectors.dim() > 3):
-            vectors = self.flatten(vectors)
-
-        vectors = self.mlp(vectors)
-
-        return vectors
-
-
-class polyline_subgraph(nn.Module):
-    def __init__(self, depth, width):
-        super(polyline_subgraph, self).__init__()
-        self.depth = depth
-        self.width = width
-        self.encode = []
-        for i in range(depth):
-            if(i == 0):
-                self.encode.append(encode(4, width))
-            else:
-                self.encode.append(encode(2*width, width))
-        self.maxpool = nn.MaxPool1d
-
-    def forward(self, x):
-        for i in range(self.depth):
-            x = self.encode[i](x)
+    def forward(self, traj_batches):
+        traj_predict = []
+        for traj, map_pre in zip(traj_batches, self.map_pres):
+            temp = self.polyline_embedding(traj)
+            temp = torch.unsqueeze(temp, -1)
+            temp = torch.cat([map_pre, temp], axis=-1)
+            temp = self.global_interaction(temp)
+            temp = temp[:, :, -1]
+            temp = self.traj_decode(temp)
+            traj_predict.append(temp)
         
-            x_len = x.shape[-1]
-            temp = self.maxpool(x_len, x_len)(x)
-            temp = temp.repeat(1, 1, x_len)
-            # The channel dimension is 1.
-            x = torch.cat([x, temp], axis=1)
-        
-        x_len = x.shape[-1]
-        x = self.maxpool(x_len, x_len)(x)
-        x = torch.squeeze(x, -1)
-
-        return x
+        return torch.cat(traj_predict, axis=0)
 
 
-class global_graph(nn.Module):
-    def __init__(self, depth, width, width_sub):
-        super(global_graph, self).__init__()
-        self.depth = depth
-        self.width = width
-        self.width = width_sub
-        self.linear_Q = []
-        self.linear_K = []
-        self.linear_V = []
+if __name__ == '__main__':
+    model = VectorNet(3, 64, 1, 128).cuda()
 
-        for i in range(depth):
-            if(i == 0):
-                self.linear_Q.append(NCL_linear(width_sub, width))
-                self.linear_K.append(NCL_linear(width_sub, width))
-                self.linear_V.append(NCL_linear(width_sub, width))
-            else:
-                self.linear_Q.append(NCL_linear(width, width))
-                self.linear_K.append(NCL_linear(width, width))
-                self.linear_V.append(NCL_linear(width, width))
+    import random
 
-        self.softmax = nn.Softmax()
+    a = []
+    for i in range(70):
+        a.append(torch.randn(1, 4, random.randint(2, 70)).cuda())
 
-    def forward(self, P_matrix):
-        # NCL format
-        # The trajectory polyline node feature is one row of the P_matrix.
-        for i in range(self.depth):
-            PQ = P_matrix; PK = P_matrix; PV = P_matrix
-            PQ = self.linear_Q[i](PQ)
-            PK = self.linear_K[i](PK)
-            PV = self.linear_V[i](PV)
-        
-            weight = torch.bmm(PQ, torch.transpose(PK, -2, -1))
-            out = torch.bmm(self.softmax(weight), PV)
-            P_matrix = out
+    b = []
+    for i in range(54):
+        b.append(torch.randn(1, 4, random.randint(2, 70)).cuda())
 
-        return P_matrix
-        
+    model.map_encode([a, b]*10)
 
-if __name__ == "__main__":
-    model = global_graph(1, 64, 128)
+    x = [torch.randn(1, 4, 32).cuda(), torch.randn(1, 4, 47).cuda()]
 
-    a = torch.randn(2, 128, 99)
-
-    out = model(a)
-    print(torch.sum(out))
-    print(out.shape)
+    print(model(x).shape)
+    torch.save(model.state_dict(), '1.pth')
