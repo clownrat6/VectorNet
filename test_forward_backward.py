@@ -1,11 +1,15 @@
 
-
+from utils.losses import *
 from utils.process import *
 from modeling.VectorNet import *
 from modeling.padding_VectorNet import *
 from dataloader.argov_dataset import dataloader
 
+mode='loglike'
+
 def padding_model_test(model, padding_data_generator):
+    loss_object = loss_collection(False)
+    loss_cal = loss_object.construct_loss(mode)
     for map_pres, train_traj, test_traj in padding_data_generator:
         predict_list = []
         model.map_encode(map_pres)
@@ -14,10 +18,14 @@ def padding_model_test(model, padding_data_generator):
             predict_list.append(out)
             train_traj = torch.cat([train_traj, torch.unsqueeze(out, -1)], -1)
         out = torch.stack(predict_list, -1)
+        loss = loss_cal(out, test_traj)
         print(out.shape, test_traj.shape)
+        print(loss)
         return None
 
 def model_test(model, data_generator):
+    loss_object = loss_collection(False)
+    loss_cal = loss_object.construct_loss(mode)
     for map_pres, train_traj, test_traj in data_generator:
         predict_list = []
         model.map_encode(map_pres)
@@ -26,7 +34,9 @@ def model_test(model, data_generator):
             predict_list.append(out)
             train_traj = [torch.cat([train_traj[i], torch.unsqueeze(out[i], -1)], -1) for i in range(len(train_traj))]
         out = torch.stack(predict_list, -1)
+        loss = loss_cal(out, test_traj)
         print(out.shape, test_traj.shape)
+        print(loss)
         return None
 
 batch_size = 2
