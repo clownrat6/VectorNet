@@ -5,17 +5,11 @@ import torch.nn as nn
 import numpy as np
 
 from tqdm import tqdm
-from dataloaders import construct_loader
 from arg_parser import arg_parser
 from modeling.VectorNet import *
 from modeling.padding_VectorNet import *
 from utils.losses import loss_collection
-from utils.metrics import metricer
 from utils.lr_scheduler import LR_Scheduler
-from utils.logger import logger
-from utils.saver import saver
-
-import matplotlib.pyplot as plt
 
 class train:
     def __init__(self, args):
