@@ -21,7 +21,8 @@ class loss_collection(object):
 
         m = coord_num*vector_num
 
-        loss = m*torch.log(torch.tensor(2*3.14))/2 + m*torch.log(Sigma) + 1/(2*var)*torch.sum(logit-target) 
+        loss = m*torch.log(torch.tensor(2*3.14))/2 + m*torch.log(Sigma) + \
+            1/(2*var)*torch.sum(torch.square(logit-target)) 
 
         if(self.cuda):
             loss = loss.cuda()

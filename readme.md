@@ -21,6 +21,17 @@ data
 python test_forward_backward.py
 ```
 
+## negetive Gaussion loglikehood
+
+首先参考似然函数的形式:  
+![](material/readme_pic/formula1.png)  
+而后是对数似然函数的形式:  
+![](material/readme_pic/formula2.png)  
+高斯分布的函数为:  
+![](material/readme_pic/formula3.png)  
+对应的负对数似然函数:  
+![](material/readme_pic/formula4.png)  
+
 ## Representing HD maps and trajectories
 
 训练与测试都是以 scenario 为单元的, 一个 scenario 总共包括 5s 内 agent, AV, OTHER 对象的位置坐标, 根据这些位置坐标我们能够从原始的 HD map 中截取与当前 scenario 有关的 map 片段来进行推理预测, 由于我们不需要关注人形横道, 以及道路的属性, 例如, 限速, 交通灯, 交通标志等等， 那么 HD map 的表征几乎只剩下道路的方向和位置了, 而且我们只需要关注 agent 这一个 object, 那么我们需要向量化来表征的就只有两项了: agent trajectory 以及 lane. agent trajectory 需要注意的是, 在 VectorNet[[1]](#ref1) 中提到仅将 (0s, 2s] 的轨迹作为推理, 而将 [2s, 5s) 的轨迹作为预测, 这里总共有 50 个坐标点, 那么此时推理部分需要 20 个坐标点, 而预测部分需要 30 个坐标点, 那么推理部分的向量为 19 个, 而预测部分的向量为 29 个. 这里 agent 的所有 trajectory 构成一个 polyline. 而对于 lane 的表征, 这里有两种表征: lane center line, lane two-side edge line:  
