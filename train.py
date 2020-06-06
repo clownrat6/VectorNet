@@ -10,6 +10,7 @@ from modeling.VectorNet import *
 from modeling.padding_VectorNet import *
 from utils.losses import loss_collection
 from utils.lr_scheduler import LR_Scheduler
+from utils.metricer import metricer
 
 class train:
     def __init__(self, args):
@@ -27,19 +28,39 @@ class train:
         else:
             assert False, 'Error!!\nUnsupported model: {}'.format(args.model)
 
-        
+        # CUDA enabled
+        if(args.cuda):
+            self.model = self.model.cuda()
+
         optimizer = torch.optim.Adam(train_params)
-        
+        self.criterion = loss_collection().construct_loss(args.loss_mode)
+
         # loss weight selection
         self.scheduler = LR_Scheduler(args.lr_scheduler, args.lr,
                                     args.epochs, len(self.train_loader))
 
-        # CUDA enabled
-        if(args.cuda):
-            self.model = self.model.cuda()
+        self.metricer = metricer()
+        if(not os.path.exists('ckpt/{}'.format(args.model))):
+            os.makedirs('ckpt/{}'.format(args.model), 0o777)
+        self.logger = logger('ckpt/{}'.format(args.model), ['DE@1s', 'DE@2s', 'DE@3s', 'ADE', 'loss'])
+        if(not os.path.exists('ckpt/{}/storage'.format(args.model))):
+            os.makedirs('ckpt/{}/storage'.format(args.model), 0o777)
+        self.saver = saver('ckpt/{}/storage'.format(args.model), args.model)
+        ret = self.saver.restore()
+        self.start_epoch = 1
+        self.best_pred = 0
+        if(ret != None):
+            self.model.load_state_dict(ret[0])
+            self.optimizer.load_state_dict(ret[1])
+            self.start_epoch = ret[2]
+            self.best_pred = ret[3]
+
         pass
 
     def training(self, epoch):
+        train_loss = 0.0
+        # train() function can activate BN layer and Dropout layer
+        self.model.train()
         pass
 
     def validating(self, epoch):
@@ -67,7 +88,7 @@ if __name__ == '__main__':
     do = train(parser)
     args = parser
 
-    # for epoch in range(do.start_epoch, args.epochs):
-    #     do.training(epoch)
-    #     if((epoch+1)%args.validation_interval == 0 and not args.no_val):
-    #         do.validating(epoch)
+    for epoch in range(do.start_epoch, args.epochs):
+        do.training(epoch)
+        if((epoch+1)%args.validation_interval == 0 and not args.no_val):
+            do.validating(epoch)

@@ -1,4 +1,4 @@
-# xxxNet implementation
+# VectorNet implementation
 
 ## Usage
 
@@ -80,6 +80,15 @@ Argoverse[[2]](#ref2) 数据集似乎提供了 Miami 和 Pittsburgh 两个城市
   
 V, k, Q 三个 embedding 特征向量经过线性层，即全连接层编码之后, 通过 K, Q 之间计算得到加权矩阵, 而后通过矩阵乘法将其叠加到 V 上.  
 
+## self-driving relation paper
+
+### IntentNet [[6]](#ref6)
+
+waiting to explain...
+
+### FaF [[7]](#ref7)
+
+waiting to explain...
 
 ## Reference
 
@@ -88,3 +97,5 @@ V, k, Q 三个 embedding 特征向量经过线性层，即全连接层编码之�
 <span id = "ref3">[3] Vaswani A, Shazeer N, Parmar N, et al. Attention is all you need[C]//Advances in neural information processing systems. 2017: 5998-6008.</span>  
 [[4] NLP中的 Attention 机制](https://zhuanlan.zhihu.com/p/59698165)  
 [[5] 自然语言处理中的自注意力机制（Self-attention Mechanism）](https://www.cnblogs.com/robert-dlut/p/8638283.html)
+<span id = "ref6">[6] Luo W, Yang B, Urtasun R. Fast and furious: Real time end-to-end 3d detection, tracking and motion forecasting with a single convolutional net[C]//Proceedings of the IEEE conference on Computer Vision and Pattern Recognition. 2018: 3569-3577.</span>
+<span id = "ref7">[7] Casas S, Luo W, Urtasun R. Intentnet: Learning to predict intention from raw sensor data[C]//Conference on Robot Learning. 2018: 947-956.</span>

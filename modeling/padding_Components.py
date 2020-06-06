@@ -91,7 +91,6 @@ class padding_polyline_encoder(nn.Module):
     def forward(self, x):
         for i in range(self.depth):
             x = self.encode[i](x)
-        
             shape = (x.shape[-2], 1)
             temp = self.maxpool(shape, shape)(x)
             temp = temp.repeat(1, 1, *shape)
