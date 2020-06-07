@@ -56,7 +56,7 @@ python test_forward_backward.py
 
 ## Global graph
 
-全局网络通过 GNN 之后会将所有的节点都更新一遍, 而这些更新了的节点中的与 agent trajectory 有关的项就可以提取出来使用 decoder 来解码, 并预测下一时刻的向量, 而重要的是我们需要预测接下来的 [2s, 5s) 的所有 trajectory 向量, 所以需要通过输入已经预测出来的 trajectory 向量合并到 agent 的 polyline 重新计算与 agent trajectory 有关的节点, 来预测已经预测出来的时刻的下一时刻.  
+全局网络通过 GNN 之后会将所有的节点都更新一遍, 而这些更新了的节点中的与 agent trajectory 有关的项就可以提取出来使用 decoder 来解码, 通过解码之后直接预测出接下来时间 [2s, 5s) 内的所有轨迹点。~~并预测下一时刻的向量, 而重要的是我们需要预测接下来的 [2s, 5s) 的所有 trajectory 向量, 所以需要通过输入已经预测出来的 trajectory 向量合并到 agent 的 polyline 重新计算与 agent trajectory 有关的节点, 来预测已经预测出来的时刻的下一时刻.~~  
   
 ![](material/readme_pic/global_graph.png)  
   
@@ -90,12 +90,25 @@ waiting to explain...
 
 waiting to explain...
 
+## some problems
+
+### The first item (solved)
+
+<span id = "problem1"></span>
+![](material/readme_pic/problem1.png)
+  
+When outputting trajectory, the network need to output all trajectory points from 2s to 5s. 
+  
+### The second item
+
+pass
+
 ## Reference
 
 <span id = "ref1">[1] Gao J, Sun C, Zhao H, et al. VectorNet: Encoding HD Maps and Agent Dynamics from Vectorized Representation[J]. arXiv preprint arXiv:2005.04259, 2020.</span>  
 <span id = "ref2">[2] Chang M F, Lambert J, Sangkloy P, et al. Argoverse: 3d tracking and forecasting with rich maps[C]//Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition. 2019: 8748-8757.</span>  
 <span id = "ref3">[3] Vaswani A, Shazeer N, Parmar N, et al. Attention is all you need[C]//Advances in neural information processing systems. 2017: 5998-6008.</span>  
 [[4] NLP中的 Attention 机制](https://zhuanlan.zhihu.com/p/59698165)  
-[[5] 自然语言处理中的自注意力机制（Self-attention Mechanism）](https://www.cnblogs.com/robert-dlut/p/8638283.html)
-<span id = "ref6">[6] Luo W, Yang B, Urtasun R. Fast and furious: Real time end-to-end 3d detection, tracking and motion forecasting with a single convolutional net[C]//Proceedings of the IEEE conference on Computer Vision and Pattern Recognition. 2018: 3569-3577.</span>
+[[5] 自然语言处理中的自注意力机制（Self-attention Mechanism）](https://www.cnblogs.com/robert-dlut/p/8638283.html)  
+<span id = "ref6">[6] Luo W, Yang B, Urtasun R. Fast and furious: Real time end-to-end 3d detection, tracking and motion forecasting with a single convolutional net[C]//Proceedings of the IEEE conference on Computer Vision and Pattern Recognition. 2018: 3569-3577.</span>  
 <span id = "ref7">[7] Casas S, Luo W, Urtasun R. Intentnet: Learning to predict intention from raw sensor data[C]//Conference on Robot Learning. 2018: 947-956.</span>

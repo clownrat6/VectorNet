@@ -15,7 +15,7 @@ class padding_VectorNet(nn.Module):
         self.width_global = width_global
         self.polyline_embedding = padding_polyline_encoder(depth_sub, width_sub)
         self.global_interaction = padding_global_graph(depth_global, width_global, width_sub)
-        self.traj_decode = nn.Linear(width_global, 4)
+        self.traj_decode = nn.Linear(width_global, 2*30)
 
     def map_encode(self, lane_polylines_batches):
         # map polyline node feature is fixed.
@@ -29,18 +29,20 @@ class padding_VectorNet(nn.Module):
         temp = self.global_interaction(temp)
         temp = temp[:, :, -1]
         temp = self.traj_decode(temp)
+        length = temp.shape[-1]
+        temp = temp.reshape((-1, 2, int(length/2)))
 
         return temp
         
 
 if __name__ == '__main__':
-    model = VectorNet(3, 64, 1, 128)
+    model = padding_VectorNet(3, 64, 1, 128)
 
     map_vectors = torch.randn(2, 4, 9, 160)
 
-    model.map_encode(a)
+    model.map_encode(map_vectors)
 
-    trajectory = torch.randn(2, 4, 19, 1)
+    trajectory = torch.randn(2, 4, 19)
     
     out = model(trajectory)
     

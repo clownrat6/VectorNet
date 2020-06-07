@@ -1,6 +1,9 @@
+import warnings
+warnings.filterwarnings("ignore")
 
 from utils.losses import *
 from utils.process import *
+from utils.metricer import *
 from modeling.VectorNet import *
 from modeling.padding_VectorNet import *
 from dataloader.argov_dataset import dataloader
@@ -10,34 +13,37 @@ mode='loglike'
 def padding_model_test(model, padding_data_generator):
     loss_object = loss_collection(False)
     loss_cal = loss_object.construct_loss(mode)
+    metric = metricer()
+    print('padding model (requiring padding data input):')
+    count = 0
     for map_pres, train_traj, test_traj in padding_data_generator:
         predict_list = []
         model.map_encode(map_pres)
-        for i in range(test_traj.shape[-1]):
-            out = model(train_traj)
-            predict_list.append(out)
-            train_traj = torch.cat([train_traj, torch.unsqueeze(out, -1)], -1)
-        out = torch.stack(predict_list, -1)
+        out = model(train_traj)
         loss = loss_cal(out, test_traj)
-        print(out.shape, test_traj.shape)
-        print(loss)
-        return None
+        metric.add_batch(out, test_traj)
+        count += 1
+        print('batch [{}] predict shape: {} ground truth shape: {} loss: {}'.format(count, out.shape, test_traj.shape, loss))
+    DE1S, DE2s, DE3s, ADE = metric.calculate()
+    print('metric -- DE@1s:{} DE@2s:{} DE@3s:{} ADE:{}'.format(DE1S, DE2s, DE3s, ADE))
+    
 
 def model_test(model, data_generator):
     loss_object = loss_collection(False)
     loss_cal = loss_object.construct_loss(mode)
+    metric = metricer()
+    print('plain model:')
+    count = 0
     for map_pres, train_traj, test_traj in data_generator:
         predict_list = []
         model.map_encode(map_pres)
-        for i in range(test_traj.shape[-1]):
-            out = model(train_traj)
-            predict_list.append(out)
-            train_traj = [torch.cat([train_traj[i], torch.unsqueeze(out[i], -1)], -1) for i in range(len(train_traj))]
-        out = torch.stack(predict_list, -1)
+        out = model(train_traj)
         loss = loss_cal(out, test_traj)
-        print(out.shape, test_traj.shape)
-        print(loss)
-        return None
+        metric.add_batch(out, test_traj)
+        count += 1
+        print('batch [{}] predict shape: {} ground truth shape: {} loss: {}'.format(count, out.shape, test_traj.shape, loss))
+    DE1S, DE2s, DE3s, ADE = metric.calculate()
+    print('metric -- DE@1s:{} DE@2s:{} DE@3s:{} ADE:{}'.format(DE1S, DE2s, DE3s, ADE))
 
 batch_size = 2
 

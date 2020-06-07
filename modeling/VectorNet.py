@@ -16,7 +16,7 @@ class VectorNet(nn.Module):
         self.width_global = width_global
         self.polyline_embedding = polyline_encoder(depth_sub, width_sub)
         self.global_interaction = global_graph(depth_global, width_global, width_sub)
-        self.traj_decode = nn.Linear(width_global, 4)
+        self.traj_decode = nn.Linear(width_global, 2*30)
 
     def map_encode(self, lane_polylines_batches):
         """
@@ -49,6 +49,8 @@ class VectorNet(nn.Module):
             temp = self.global_interaction(temp)
             temp = temp[:, :, -1]
             traj_predict = self.traj_decode(temp)
+            length = traj_predict.shape[-1]
+            traj_predict = traj_predict.reshape((-1, 2, int(length/2)))
             traj_predict_batch.append(traj_predict)
         
         return torch.cat(traj_predict_batch, 0)

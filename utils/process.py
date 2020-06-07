@@ -166,11 +166,9 @@ def scenario_vectorization(one_scenario):
         train_trajectory.append(vector)
 
     test_trajectory = []
-    for i in range(20, 49):
-        start = (agent_traj[i][0] - lc[0], agent_traj[i][1] - lc[1])
-        end = (agent_traj[i+1][0] - lc[0], agent_traj[i+1][1] - lc[1])
-        vector = np.array([*start, *end])
-        test_trajectory.append(vector)
+    for i in range(20, 50):
+        traj_point = (agent_traj[i][0] - lc[0], agent_traj[i][1] - lc[1])
+        test_trajectory.append(np.array(traj_point))
     
     return vector_sets, train_trajectory, test_trajectory
 
@@ -184,6 +182,8 @@ if __name__ == "__main__":
 
     print('scenario lane polylines num: {}'.format(len(map_pres))) 
     print('train trajectory vector num: {}\ntest trajectory vector num:{}'.format(len(train_trajectory), len(test_trajectory)))
+
+    print(test_trajectory[0])
 
     ap.visualization_lanes(ap.scenarios[0])
     ap.visualization_trajectory(ap.scenarios[0])
