@@ -71,39 +71,47 @@ class argoverse_processor(object):
         return lane_centerlines, edges1, edges2
 
     def visualization_lanes(self, one_scenario):
+        plt.figure(figsize=(8, 7))
         lane_cls, lane_eds1, lane_eds2 = self.acquire_lane_centerlines_and_edgelines(one_scenario)
         
         for lane_cl in lane_cls:
-            a, = plt.plot(lane_cl[:, 0], lane_cl[:, 1], '--', label='lane_centerline', color='#17A9C3', linewidth=2) # color='#C7398D')
+            a, = plt.plot(lane_cl[:, 0], lane_cl[:, 1], '--', label='lane_centerline', color='#17A9C3', linewidth=1) # color='#C7398D')
         
         for lane_ed in lane_eds1:
-            b, = plt.plot(lane_ed[:, 0], lane_ed[:, 1], label='lane_edgeline', color='#C7398D', linewidth=2) # color='#314E87')
+            b, = plt.plot(lane_ed[:, 0], lane_ed[:, 1], label='lane_edgeline', color='#C7398D', linewidth=1) # color='#314E87')
         
         for lane_ed in lane_eds2:
-            c, = plt.plot(lane_ed[:, 0], lane_ed[:, 1], label='lane_edgeline', color='#C7398D', linewidth=2)
+            c, = plt.plot(lane_ed[:, 0], lane_ed[:, 1], label='lane_edgeline', color='#C7398D', linewidth=1)
         
-        plt.legend([a, b], ['lane_centerline', 'lane_edgeline'], fontsize=12)
+        plt.legend([a, b], ['lane_centerline', 'lane_edgeline'], fontsize=10)
         plt.axis('off')
         plt.show()
 
 
     def visualization_trajectory(self, one_scenario):
+        plt.figure(figsize=(8, 7))
         lane_cls, lane_eds1, lane_eds2 = self.acquire_lane_centerlines_and_edgelines(one_scenario)
         
         for lane_cl in lane_cls:
-            plt.plot(lane_cl[:, 0], lane_cl[:, 1], '--', color='#17A9C3', linewidth=2) # color='#C7398D')
+            a, = plt.plot(lane_cl[:, 0], lane_cl[:, 1], '--', color='grey', linewidth=1) # color='#C7398D')
         
         for lane_ed in lane_eds1:
-            plt.plot(lane_ed[:, 0], lane_ed[:, 1], color='#C7398D', linewidth=2) # color='#314E87')
+            b, = plt.plot(lane_ed[:, 0], lane_ed[:, 1], color='grey', linewidth=1) # color='#314E87')
         
         for lane_ed in lane_eds2:
-            plt.plot(lane_ed[:, 0], lane_ed[:, 1], color='#C7398D', linewidth=2)
+            c, = plt.plot(lane_ed[:, 0], lane_ed[:, 1], color='grey', linewidth=1)
 
         traj = self.acquire_agent_trajectory(one_scenario)
 
-        plt.plot(traj[:, 0], traj[:, 1], '-', color='#E0DD00', alpha=1, linewidth=1, zorder=2)
-        plt.plot(traj[-1, 0], traj[-1, 1], 'o', color='#E0DD00', alpha=1, markersize=7, zorder=2)
+        train_traj = traj[:20]
+        pred_traj = traj[20:]
+
+        d, = plt.plot(train_traj[:, 0], train_traj[:, 1], '-', color='#17A9C3', alpha=1, linewidth=2, zorder=2)
+        e, = plt.plot(train_traj[-1, 0], train_traj[-1, 1], 'o', color='#17A9C3', alpha=1, markersize=7, zorder=2)
         
+        f, = plt.plot(pred_traj[:, 0], pred_traj[:, 1], '-', color='#C7398D', alpha=1, linewidth=1, zorder=2)
+
+        plt.legend([a, b, d, f], ['lane_centerline', 'lane_edgeline', 'observed_agent_trajectory', 'future_agent_trajectory'], fontsize=10)
         plt.axis('off')
         plt.show()
 
@@ -179,14 +187,14 @@ if __name__ == "__main__":
 
     scenario = scenario_object(ap.scenarios[0], ap)
 
-    viz_sequence(ap.scenarios[0].seq_df, show=True)
+    # viz_sequence(ap.scenarios[0].seq_df, show=True)
+    # exit()
 
     map_pres, train_trajectory, test_trajectory = scenario_vectorization(scenario)
 
     print('scenario lane polylines num: {}'.format(len(map_pres))) 
     print('train trajectory vector num: {}\ntest trajectory vector num:{}'.format(len(train_trajectory), len(test_trajectory)))
 
-    print(test_trajectory[0])
 
     ap.visualization_lanes(ap.scenarios[0])
     ap.visualization_trajectory(ap.scenarios[0])

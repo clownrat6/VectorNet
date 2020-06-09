@@ -42,7 +42,19 @@ python test_forward_backward.py
   
 ![](material/readme_pic/some_lanes_of_Miami.png)  
   
-根据 [[1]](#ref1) 中的 Figure 2, 似乎是用 lane two-side edge line 来表征 lane, lane two-side edge line 也是通过坐标点来表征的, 我梦恩据坐标点将其向量化, 这里 lane 被分为了很多小段而一小段 lane 就构成一个 polyline. 这里由于 [[1]](#ref1) 中提到了要将以最后一个推理部分的观测点作参考, 所以我们所有的坐标点都减去了当前 scenario 下最后一个观测点即 agent trajectory 在 2s 时的坐标.  
+附加上 agent trajectory:
+  
+![](material/readme_pic/some_lanes_and_agent_trajectory_of_Miami.png)
+  
+根据 [[1]](#ref1) 中的 Figure 2, 似乎是用 lane two-side edge line 来表征 lane, lane two-side edge line 也是通过坐标点来表征的, 我梦恩据坐标点将其向量化, 这里 lane 被分为了很多小段而一小段 lane 就构成一个 polyline. 这里由于 [[1]](#ref1) 中提到了要将以最后一个推理部分的观测点作参考, 所以我们所有的坐标点都减去了当前 scenario 下最后一个观测点即 agent trajectory 在 2s 时的坐标. 
+
+这里将向量化的具体过程可视化出来，首先收集 lane two-side edge line, observed trajectory, future trajectory 的采样点, 而后将相邻的两个采样点使用向量连接起来:  
+
+![](material/readme_pic/point_sets_vectorization_process.png)  
+  
+而后再将其向量化将点集转化为向量集，由于我们的目标是预测出未来的轨迹采样点，所以我们保留了未来轨迹的采样点，而没有将其向量化:  
+  
+![](material/readme_pic/vector_sets.png)
 
 ## Constructing the polyline subgraphs
 
