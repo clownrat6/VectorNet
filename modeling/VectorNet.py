@@ -18,13 +18,15 @@ class VectorNet(nn.Module):
         self.global_interaction = global_graph(depth_global, width_global, width_sub)
         self.traj_decode = nn.Linear(width_global, 2*30)
 
-    def map_encode(self, lane_polylines_batches):
-        """
-        Map representation like lane two-side line is fixed. So we use a object attribute to keep it.
-        input:
-            lane_polylines_batches: [lane_polylines]*batch_size. the number of polylines are different between items in batch.
-                p.s. lane_polylines = [lane_polyline]*polyline_num, lane_polyline.shape = [4(coordinates, lane_polyline_vector_num)]  
-        """
+    # def map_encode(self, lane_polylines_batches):
+    #     """
+    #     Map representation like lane two-side line is fixed. So we use a object attribute to keep it.
+    #     input:
+    #         lane_polylines_batches: [lane_polylines]*batch_size. the number of polylines are different between items in batch.
+    #             p.s. lane_polylines = [lane_polyline]*polyline_num, lane_polyline.shape = [4(coordinates, lane_polyline_vector_num)]  
+    #     """
+
+    def forward(self, traj_batch, lane_polylines_batches):
         # map polyline node feature is fixed.
         # shape: [[[4(coordinates), lane_polyline_vector_num], ...], ...]
         self.map_pres_batch = []
@@ -39,7 +41,6 @@ class VectorNet(nn.Module):
 
             self.map_pres_batch.append(torch.stack(lane_polyline_node_features, -1))
 
-    def forward(self, traj_batch):
         traj_predict_batch = []
         for traj, map_pres in zip(traj_batch, self.map_pres_batch):
             traj = torch.unsqueeze(traj, 0)
@@ -52,7 +53,6 @@ class VectorNet(nn.Module):
             length = traj_predict.shape[-1]
             traj_predict = traj_predict.reshape((-1, 2, int(length/2)))
             traj_predict_batch.append(traj_predict)
-        
         return torch.cat(traj_predict_batch, 0)
 
 

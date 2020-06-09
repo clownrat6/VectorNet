@@ -17,15 +17,10 @@ class padding_VectorNet(nn.Module):
         self.global_interaction = padding_global_graph(depth_global, width_global, width_sub)
         self.traj_decode = nn.Linear(width_global, 2*30)
 
-    def map_encode(self, lane_polylines_batches):
-        # map polyline node feature is fixed.
-        # shape: [[[4(coordinates), lane_polyline_vector_num], ...], ...]
-        self.map_pres = self.polyline_embedding(lane_polylines_batches)
-        return self.map_pres
-
-    def forward(self, traj_batches):
+    def forward(self, traj_batches, lane_polylines_batches):
+        map_pres = self.polyline_embedding(lane_polylines_batches)
         traj_batches = self.polyline_embedding(torch.unsqueeze(traj_batches, -1))
-        temp = torch.cat([self.map_pres, traj_batches], axis=-1)
+        temp = torch.cat([map_pres, traj_batches], axis=-1)
         temp = self.global_interaction(temp)
         temp = temp[:, :, -1]
         temp = self.traj_decode(temp)

@@ -6,8 +6,12 @@ try.py
 *.pkl
 
 # folder
+
+# global
+
 .vscode/
 __pycache__/
+ckpt/
 
 # local
 
