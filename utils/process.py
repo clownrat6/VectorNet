@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from argoverse.map_representation.map_api import ArgoverseMap
 from argoverse.data_loading.argoverse_tracking_loader import ArgoverseTrackingLoader
 from argoverse.data_loading.argoverse_forecasting_loader import ArgoverseForecastingLoader
+from argoverse.visualization.visualize_sequences import viz_sequence
 
 root_base_path = 'data'
 
@@ -177,6 +178,8 @@ if __name__ == "__main__":
     ap = argoverse_processor()
 
     scenario = scenario_object(ap.scenarios[0], ap)
+
+    viz_sequence(ap.scenarios[0].seq_df, show=True)
 
     map_pres, train_trajectory, test_trajectory = scenario_vectorization(scenario)
 

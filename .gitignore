@@ -19,4 +19,5 @@ thirdparty/*
 material/*
 !.keep
 !material/readme_pic
+!material/presentation.pptx
 
