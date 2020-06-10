@@ -4,10 +4,9 @@
 try.py
 *.pth
 *.pkl
+~*
 
 # folder
-
-# global
 
 .vscode/
 __pycache__/
@@ -24,4 +23,5 @@ material/*
 !.keep
 !material/readme_pic
 !material/presentation.pptx
-
+!material/presentation.pdf
+pre_script*

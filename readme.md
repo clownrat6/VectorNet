@@ -25,7 +25,7 @@ data
 python test_forward_backward.py
 ```
 
-## negetive Gaussion loglikehood
+## Negetive Gaussion loglikehood
 
 首先参考似然函数的形式:  
 ![](material/readme_pic/formula1.png)  
@@ -55,6 +55,10 @@ python test_forward_backward.py
 而后再将其向量化将点集转化为向量集，由于我们的目标是预测出未来的轨迹采样点，所以我们保留了未来轨迹的采样点，而没有将其向量化:  
   
 ![](material/readme_pic/vector_sets.png)
+  
+完整流程汇总如下:  
+  
+![](material/readme_pic/point_sets_vectorization_complete_process.png)
 
 ## Constructing the polyline subgraphs
 
