@@ -80,8 +80,6 @@ python test_forward_backward.py
   
 ![](material/readme_pic/global_graph.png)  
   
-  
-
 ## Argoverse dataset
 
 Argoverse[[2]](#ref2) 数据集似乎提供了 Miami 和 Pittsburgh 两个城市的 HD map 以及在这两个城市记录的 agent 和 AV (Autonomous Vehicle) 的运动路径. 同时还提供了 3D 追踪的 bbox 标注, 不过我们并不需要用到. 我们主要使用数据集的 Motion Forecasting 部分. 数据集将每个 agent 以及 AV 还有 other 对象的运动序列组装为一个文件, 其中 AV 不仅仅是自动驾驶汽车, 同时也是测量设备的所在处, 每个运动序列由 5s 构成, 而采样频率是 10Hz, 则意味着 5s 采样了 50 个坐标点, 单个文件中包含的所有关于对象们的运动序列的信息又被称为 scenario, 数据集一共有 324557 个 scenario, 官方将其划分为了训练集, 验证集, 测试集, 其中训练集中有大约 211K 个 scenario, 验证集大约有 41K 个 scenario, 测试集大约有 80K 个 scenario.  
@@ -104,7 +102,7 @@ V, k, Q 三个 embedding 特征向量经过线性层，即全连接层编码之�
 
 ### IntentNet [[6]](#ref6)
 
-waiting to explain...
+
 
 ### FaF [[7]](#ref7)
 
