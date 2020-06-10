@@ -19,7 +19,7 @@ class train:
         self.args = args
 
         self.train_loader, self.valid_loader = construct_loader(args.train_path, \
-            args.valid_path, args.batch_size, args.dataset)
+            args.valid_path, args.batch_size, args.dataset, args.cuda)
 
         # Define Optimizer,model
         if(args.model == 'padding_vectornet'):
@@ -94,9 +94,9 @@ class train:
     def validating(self, epoch):
         self.model.eval()
         if(self.args.padding):
-            generator = self.train_loader.padding_dataset_generator
+            generator = self.train_loader.padding_dataset_generator()
         else:
-            generator = self.train_loader.dataset_generator
+            generator = self.train_loader.dataset_generator()
         
         valid_loss = 0.0
         i = 0
@@ -111,9 +111,9 @@ class train:
             self.metricer.add_batch(pred_traj, test_traj)
 
         DE1s, DE2s, DE3s, ADE = self.metricer.calculate()
-        temp_string = '[Epoch: %d, Batches: %d] validation\n' % (epoch, self.args.bach_size * i)
+        temp_string = '[Epoch: %d, Batches: %d] validation\n' % (epoch, self.args.batch_size * i)
         temp_string += 'Average Loss: %.3f' % (valid_loss)
-        temp_string += 'metric -- DE@1s:{} DE@2s:{} DE@3s:{} ADE:{}'.format(DE1S, DE2s, DE3s, ADE)
+        temp_string += 'metric -- DE@1s:{} DE@2s:{} DE@3s:{} ADE:{}'.format(DE1s, DE2s, DE3s, ADE)
         print(temp_string)
         if(ADE < self.best_pred):
             self.best_pred = ADE
@@ -134,8 +134,8 @@ if __name__ == '__main__':
     parser.add_val('--width_sub', 64)
     parser.add_val('--depth_global', 1)
     parser.add_val('--width_global', 128)
-    parser.add_val('--train_path', r'data/argoverse-forecasting/forecasting_train_v1.1')
-    parser.add_val('--valid_path', r'data/argoverse-forecasting/forecasting_val_v1.1')
+    parser.add_val('--train_path', r'data/argoverse-forecasting/forecasting_train_v1.1/data')
+    parser.add_val('--valid_path', r'data/argoverse-forecasting/forecasting_val_v1.1/data')
     parser.add_val('--batch_size', 2)
     parser.add_val('--cuda', True)
     parser.add_val('--loss_mode', 'loglike')
