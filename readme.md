@@ -38,7 +38,7 @@ python test_forward_backward.py
 
 ## Representing HD maps and trajectories
 
-训练与测试都是以 scenario 为单元的, 一个 scenario 总共包括 5s 内 agent, AV, OTHER 对象的位置坐标, 根据这些位置坐标我们能够从原始的 HD map 中截取与当前 scenario 有关的 map 片段来进行推理预测, 由于我们不需要关注人形横道, 以及道路的属性, 例如, 限速, 交通灯, 交通标志等等， 那么 HD map 的表征几乎只剩下道路的方向和位置了, 而且我们只需要关注 agent 这一个 object, 那么我们需要向量化来表征的就只有两项了: agent trajectory 以及 lane. agent trajectory 需要注意的是, 在 VectorNet[[1]](#ref1) 中提到仅将 (0s, 2s] 的轨迹作为推理, 而将 [2s, 5s) 的轨迹作为预测, 这里总共有 50 个坐标点, 那么此时推理部分需要 20 个坐标点, 而预测部分需要 30 个坐标点, 那么推理部分的向量为 19 个, 而预测部分的向量为 29 个. 这里 agent 的所有 trajectory 构成一个 polyline. 而对于 lane 的表征, 这里有两种表征: lane center line, lane two-side edge line:  
+训练与测试都是以 scenario 为单元的, 一个 scenario 总共包括 5s 内 agent, AV, OTHER 对象的位置坐标, 根据这些位置坐标我们能够从原始的 HD map 中截取与当前 scenario 有关的 map 片段来进行推理预测, 由于我们不需要关注人形横道, 以及道路的属性, 例如, 限速, 交通灯, 交通标志等等， 那么 HD map 的表征几乎只剩下道路的方向和位置了, 而且我们只需要关注 agent 这一个 object, 那么我们需要向量化来表征的就只有两项了: agent trajectory 以及 lane. agent trajectory 需要注意的是, 在 VectorNet[[1]](#ref1) 中提到仅将 (0s, 2s] 的轨迹作为推理, 而将 [2s, 5s) 的轨迹作为预测, 最终我们的预测目标是预测部分的点集, 这里总共有 50 个坐标点, 那么此时推理部分需要 20 个坐标点, 而预测部分需要 30 个坐标点, 那么推理部分的向量为 19 个, 而预测部分则保留为 30 个坐标点. 这里 agent 的所有 trajectory 构成一个 polyline. 而对于 lane 的表征, 这里有两种表征: lane center line, lane two-side edge line:  
   
 ![](material/readme_pic/some_lanes_of_Miami.png)  
   
@@ -100,13 +100,28 @@ V, k, Q 三个 embedding 特征向量经过线性层，即全连接层编码之�
 
 ## self-driving relation paper
 
-### IntentNet [[6]](#ref6)
+### Fast and Furious [[6]](#ref6)
 
+FaF 是一个比较传统的轨迹预测网络，其主要成果在于能够将激光雷达扫描得到的 3D 点云体素化，将其转化为可被卷积的张量，其体素化的示意图如下:  
+  
+![](material/readme_pic/voxelization.png)  
+  
+体素化变为张量之后，则通过卷积神经网络来同时实现目标检测，目标跟踪，轨迹预测，实际上这个就是一个端到端的各个常规计算机视觉任务混合的网络。  
+  
+![](material/readme_pic/FaF.png)
 
+### IntentNet [[7]](#ref7)
 
-### FaF [[7]](#ref7)
+IntentNet 实际上和 FaF 很相似，不过他对比起 FaF 只输入激光雷达的 3D 点云数据还输入了自定义的 HD map，即通过各种颜色表征来代表各种语义信息:  
+  
+![](material/readme_pic/IntentNet_HD_map.png)  
+  
+IntentNet 同时实现目标检测任务，意图检测任务，轨迹预测任务，通过查阅主 pipeline 就可以一目了然:  
+  
+![](material/readme_pic/pipeline_IntentNet.png)
+  
+这里关于轨迹预测还有一点就是，其实轨迹预测有两种方式，一种是 one-shot 的方式，即一次性回归出所有预测时间范围内的轨迹，一种是 recurrent 的方式，即以某个时间长度为间隔递归地预测轨迹，这个说法有在 Rules of the Road [[8]](#ref8) 中有提到。
 
-waiting to explain...
 
 ## some problems
 
@@ -121,6 +136,36 @@ When outputting trajectory, the network need to output all trajectory points fro
 
 pass
 
+## Interview
+
+### 1. FFT 的计算复杂度是多少？
+
+之前在学习信号与系统的时候，老师并未将其作为重点讨论而是仅作为拓展内容，所以借此机会再复习一下
+要研究 FFT 的计算复杂度就得首先追究 DFT，DFT 的公式为:  
+  
+![](material/readme_pic/formula5.png)
+  
+针对每一个 x(k) 都要进行 n 次计算，显然其复杂度为 O(n^2)，FFT 实际上是另一种 DFT 的实现方式，FFT 主要对原始的 DFT 算法采用了分治法来改进，即常规的 DFT 可以通过划分奇序列和偶序列而分裂成两个 DFT，而这两个 DFT 又可以继续分裂，就这样递归地分裂直到直接可解，由此 O(n^2) 降为了 O(nlog2n)  
+
+### 2. 线程与进程是什么？
+
+专业来讲:  
+进程是操作系统资源调度的最小单元  
+线程是 CPU 资源调度的最小单元  
+(学半导体真心不太懂这个)
+
+### 3. 均方差和极大似然估计的区别？
+
+这个答得不是很好，我答的是均方差和高斯分布的极大对数似然估计在数学表达式上比较接近，高斯分布的极大对数似然估计只是均方差公式再多加了几个项而已，其实主要是想到了 VectorNet 的损失函数表达式，即高斯分布的极大对数似然估计函数表达式，好像确实就是均方差加了几个项而已。  
+  
+查阅相关资料发现，这二者似乎在某种情况下是等价的，[使用这二者来对某个分布下的事件进行估计的时候得到的概率是相同的](https://blog.csdn.net/qq_14997473/article/details/89230118)，不过似乎还是差一点接触到本质。
+
+To be continued
+
+### 4. 你用过什么无监督的模型？
+
+答的是 [W-Net](#ref8) 大概老师也没太懂吧，其实应该慢点答的，在情感识别项目中就使用自编码器来提取图像自编码特征来更高效地进行情感建模，面试还是太慌张了一点，没有很好地表达自己的意思，除了自编码器还有聚类算法，主成分分析算法，例如，YOLO 计算先验 Anchor 时就有使用聚类算法，在医学数据分析的时候分析肿瘤诱发源的时候也使用过主成分分析算法。
+
 ## Reference
 
 <span id = "ref1">[1] Gao J, Sun C, Zhao H, et al. VectorNet: Encoding HD Maps and Agent Dynamics from Vectorized Representation[J]. arXiv preprint arXiv:2005.04259, 2020.</span>  
@@ -128,5 +173,7 @@ pass
 <span id = "ref3">[3] Vaswani A, Shazeer N, Parmar N, et al. Attention is all you need[C]//Advances in neural information processing systems. 2017: 5998-6008.</span>  
 [[4] NLP中的 Attention 机制](https://zhuanlan.zhihu.com/p/59698165)  
 [[5] 自然语言处理中的自注意力机制（Self-attention Mechanism）](https://www.cnblogs.com/robert-dlut/p/8638283.html)  
-<span id = "ref6">[6] Luo W, Yang B, Urtasun R. Fast and furious: Real time end-to-end 3d detection, tracking and motion forecasting with a single convolutional net[C]//Proceedings of the IEEE conference on Computer Vision and Pattern Recognition. 2018: 3569-3577.</span>  
-<span id = "ref7">[7] Casas S, Luo W, Urtasun R. Intentnet: Learning to predict intention from raw sensor data[C]//Conference on Robot Learning. 2018: 947-956.</span>
+<span id = "ref6">[6] Casas S, Luo W, Urtasun R. Intentnet: Learning to predict intention from raw sensor data[C]//Conference on Robot Learning. 2018: 947-956.</span>  
+<span id = "ref7">[7] Luo W, Yang B, Urtasun R. Fast and furious: Real time end-to-end 3d detection, tracking and motion forecasting with a single convolutional net[C]//Proceedings of the IEEE conference on Computer Vision and Pattern Recognition. 2018: 3569-3577.</span>  
+<span id = "ref8">[8] Hong J, Sapp B, Philbin J. Rules of the road: Predicting driving behavior with a convolutional model of semantic interactions[C]//Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition. 2019: 8454-8462.</span>  
+<span id = "ref9">[9] Xia X, Kulis B. W-net: A deep model for fully unsupervised image segmentation[J]. arXiv preprint arXiv:1711.08506, 2017.</span>  
