@@ -18,6 +18,9 @@ extract_y = lambda list_: [x[1] for x in list_]
 
 
 class argoverse_processor(object):
+    """
+    This object can extract context information from raw map file and raw trajectory file.
+    """
     def __init__(self, scenario_path = _sample_path):
         self.map_pres = ArgoverseMap()
         self.scenarios = ArgoverseForecastingLoader(scenario_path)
@@ -117,6 +120,9 @@ class argoverse_processor(object):
 
 
 class scenario_object(object):
+    """
+    a wrapper object of raw scenario object.
+    """
     def __init__(self, argoverse_scenario, argoverse_processor):
         self.main = argoverse_scenario
         self.ap = argoverse_processor

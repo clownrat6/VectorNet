@@ -1,6 +1,9 @@
 from . import argov_dataset
 
 def construct_loader(train_path, valid_path, batch_size, dataset_name, ifcuda):
+    """
+    constructing data loader.
+    """
     if dataset_name == 'Argoverse':
         train_loader = argov_dataset.dataloader(batch_size, ifcuda, train_path)
         valid_loader = argov_dataset.dataloader(batch_size, ifcuda, valid_path)

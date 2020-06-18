@@ -8,6 +8,9 @@ class saver(object):
         self.epoch = 0
 
     def restore(self):
+        """
+        restore the newest model checkpoint.
+        """
         model_list = os.listdir(self.model_base_path)
         if(len(model_list) == 0): 
             print('=>{}, There is no checkpoint'.format(self.model_base_path))
@@ -24,6 +27,9 @@ class saver(object):
             return checkpoint['model'],checkpoint['optimizer'],self.epoch,self.best_pred
 
     def save(self, epoch, pred, model, optimizer):
+        """
+        save the model which has best performance.
+        """
         if(pred > self.best_pred):
             model_save_path = os.path.join(self.model_base_path, '{}_%.4f.pth'.format(epoch)%(pred))
             torch.save(

@@ -6,6 +6,7 @@ import random
 
 from utils.process import *
 
+
 def map_representation_padding(map_pres, map_polyline_num, polyline_vector_num):
     """
     padding the map presentation of scenario.
@@ -65,6 +66,7 @@ def form_padding_batch(scenario_list, map_polyline_num, polyline_vector_num, ifc
         test_trajectory_batch = test_trajectory_batch.cuda()
 
     return map_vectors_batch, train_trajectory_batch, test_trajectory_batch
+
 
 def form_batch(scenario_list, ifcuda=False):
     """
@@ -142,6 +144,7 @@ class dataloader(object):
             if len(scenario_list) == batch_size:
                 yield form_batch(scenario_list, ifcuda=self.ifcuda)
                 scenario_list = []
+
 
 if __name__ == "__main__":
     dataset = dataloader(2, True)
