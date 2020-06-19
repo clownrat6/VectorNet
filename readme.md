@@ -2,7 +2,7 @@
 
 ## Usage
 
-The data folder have following structure:
+The "data" folder needs following structure:
 ```
 data
 |--argoverse-forecasting
