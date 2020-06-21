@@ -105,6 +105,9 @@ class padding_polyline_encoder(nn.Module):
 
 
 class padding_global_graph(nn.Module):
+    """
+    The global graph interactions which are implemented by the multi-head attention of self-attention.
+    """
     def __init__(self, depth, width, width_sub):
         super(padding_global_graph, self).__init__()
         self.depth = depth

@@ -12,6 +12,9 @@ mode = 'loglike'
 ifcuda = True
 
 def padding_model_test(model, padding_data_generator):
+    """
+    One-shot forward inference of padding model.
+    """
     loss_object = loss_collection(False)
     loss_cal = loss_object.construct_loss(mode)
     metric = metricer()
@@ -29,6 +32,9 @@ def padding_model_test(model, padding_data_generator):
     
 
 def model_test(model, data_generator):
+    """
+    One-shot forward inference of plain model.
+    """
     loss_object = loss_collection(False)
     loss_cal = loss_object.construct_loss(mode)
     metric = metricer()
